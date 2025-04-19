@@ -23,7 +23,6 @@ const ChatbotPage = () => {
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useAuth();
 
-  // Handle Google OAuth redirect
   useEffect(() => {
     const token = searchParams.get('token');
     const userId = searchParams.get('userId');
@@ -33,13 +32,9 @@ const ChatbotPage = () => {
     }
   }, [searchParams, loginWithToken]);
 
-  // Improved scroll implementation that accounts for mobile keyboards
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
-      // First attempt - smooth scroll to bottom of messages
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      
-      // Second attempt - force scroll after a short delay to handle keyboard adjustments
       setTimeout(() => {
         if (messagesContainerRef.current) {
           messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -52,10 +47,8 @@ const ChatbotPage = () => {
     scrollToBottom();
   }, [messages]);
 
-  // Detect keyboard visibility on mobile
   useEffect(() => {
     const handleResize = () => {
-      // This helps adjust for the keyboard appearing
       if (messagesContainerRef.current) {
         messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
       }
@@ -67,25 +60,22 @@ const ChatbotPage = () => {
 
   const handleSend = async () => {
     if (input.trim() === '') return;
-    
-    // Add user message
+
     const userMessage = {
       id: Date.now(),
       text: input,
       sender: 'user',
       timestamp: new Date()
     };
-    
+
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
-    
-    // Focus logic to ensure input stays visible
+
     setTimeout(() => {
       scrollToBottom();
     }, 0);
-    
-    // Simulate AI response
+
     setTimeout(() => {
       const botResponses = [
         "I notice you use descriptive language. This suggests you might have strong visualization abilities and creativity.",
@@ -95,16 +85,16 @@ const ChatbotPage = () => {
         "The way you express yourself indicates strong emotional intelligence and empathy.",
         "Your communication style suggests you're pragmatic and solution-oriented."
       ];
-      
+
       const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-      
+
       const botMessage = {
         id: Date.now(),
         text: randomResponse,
         sender: 'bot',
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, botMessage]);
       setIsTyping(false);
     }, 1500);
@@ -125,8 +115,9 @@ const ChatbotPage = () => {
     <div className="min-h-screen bg-dark flex flex-col">
       <Navigation />
       
-      <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4">
+      <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4 overflow-hidden">
         <div className="bg-glass rounded-xl flex flex-col flex-1 overflow-hidden">
+          
           {/* Chat header */}
           <div className="border-b border-white/10 p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -145,10 +136,10 @@ const ChatbotPage = () => {
             </div>
           </div>
           
-          {/* Chat messages - Improved implementation */}
+          {/* Chat messages */}
           <div 
             ref={messagesContainerRef}
-            className="flex-1 overflow-y-auto p-4 space-y-4"
+            className="flex-1 min-h-0 overflow-y-auto p-4 space-y-4"
           >
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -161,8 +152,7 @@ const ChatbotPage = () => {
                   <div className="flex items-center space-x-2 mb-1">
                     {message.sender === 'bot' 
                       ? <Bot size={16} className="text-teal" /> 
-                      : <User size={16} className="text-purple" />
-                    }
+                      : <User size={16} className="text-purple" />}
                     <span className="text-xs text-gray-400">
                       {message.sender === 'bot' ? 'Personality Predictor AI' : 'You'} • {formatTime(message.timestamp)}
                     </span>
@@ -171,7 +161,7 @@ const ChatbotPage = () => {
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-white/5 rounded-2xl rounded-tl-sm p-4 max-w-[70%]">
@@ -183,12 +173,11 @@ const ChatbotPage = () => {
                 </div>
               </div>
             )}
-            
-            {/* Reference for scrolling with improved accessibility */}
+
             <div ref={messagesEndRef} className="h-1" />
           </div>
           
-          {/* Chat input with improved layout for mobile */}
+          {/* Chat input */}
           <div className="border-t border-white/10 p-4 sticky bottom-0 bg-dark">
             <div className="flex gap-2">
               <Input
@@ -210,6 +199,7 @@ const ChatbotPage = () => {
           </div>
         </div>
       </main>
+
       <Footer />
     </div>
   );
