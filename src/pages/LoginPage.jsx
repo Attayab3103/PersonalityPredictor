@@ -20,6 +20,10 @@ const LoginPage = () => {
     window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/google';
   };
 
+  const handleFacebookLogin = () => {
+    window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook';
+  };
+
   return (
     <div className="min-h-screen bg-dark flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -131,7 +135,7 @@ const LoginPage = () => {
                 Google
               </Button>
               
-              <Button variant="outline" className="border-white/10 hover:bg-white/5">
+              <Button variant="outline" className="border-white/10 hover:bg-white/5" onClick={handleFacebookLogin} type="button">
                 <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M9.09 10.27v3.46H13.5c-.18 1.45-1.36 2.27-2.8 2.27-1.7 0-3.15-1.37-3.15-3.15 0-1.78 1.44-3.15 3.15-3.15.77 0 1.5.29 2.04.75l2.05-2.05c-1-.93-2.32-1.5-4.09-1.5-3.34 0-6.14 2.72-6.14 6.06S3.36 19.06 6.7 19.06c5.14 0 6.25-4.59 5.57-8.77H9.09z" />
                 </svg>

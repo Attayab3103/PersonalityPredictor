@@ -48,6 +48,34 @@ router.get('/google/callback',
     }
 );
 
+// Facebook OAuth routes
+router.get('/facebook',
+    passport.authenticate('facebook', { 
+        scope: ['email'],
+        session: false
+    })
+);
+
+router.get('/facebook/callback',
+    passport.authenticate('facebook', { 
+        failureRedirect: `${process.env.FRONTEND_URL}/login?error=Authentication failed`,
+        session: false
+    }),
+    async (req, res) => {
+        try {
+            if (!req.user) {
+                return res.redirect(`${process.env.FRONTEND_URL}/login?error=Authentication failed`);
+            }
+            const token = req.user.generateToken();
+            // Redirect to auth callback with token and userId
+            res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}&userId=${req.user._id}`);
+        } catch (error) {
+            console.error('Facebook callback error:', error);
+            res.redirect(`${process.env.FRONTEND_URL}/login?error=Authentication failed`);
+        }
+    }
+);
+
 // User profile route
 router.get('/user/profile', protect, (req, res) => {
     res.json({
