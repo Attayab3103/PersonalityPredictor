@@ -53,7 +53,7 @@ const HeroSection = () => {
             <div className="text-purple mb-4">
               <Brain size={32} />
             </div>
-            <h3 className="text-xl font-semibold mb-2">AI-Powered Analysis</h3>
+            <h3 className="text-xl text-white font-semibold mb-2">AI-Powered Analysis</h3>
             <p className="text-gray-400">
               Advanced algorithms analyze your communication patterns to reveal personality insights.
             </p>
@@ -63,7 +63,7 @@ const HeroSection = () => {
             <div className="text-purple mb-4">
               <MessageSquare size={32} />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Natural Conversation</h3>
+            <h3 className="text-xl text-white font-semibold mb-2">Natural Conversation</h3>
             <p className="text-gray-400">
               Chat naturally with our AI and receive real-time personality assessments.
             </p>
@@ -73,7 +73,7 @@ const HeroSection = () => {
             <div className="text-purple mb-4">
               <Brain size={32} />
             </div>
-            <h3 className="text-xl font-semibold mb-2">Deep Insights</h3>
+            <h3 className="text-xl text-white font-semibold mb-2">Deep Insights</h3>
             <p className="text-gray-400">
               Get detailed insights about your personality traits, strengths, and growth areas.
             </p>
