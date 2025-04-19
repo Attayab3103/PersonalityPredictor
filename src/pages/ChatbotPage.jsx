@@ -19,7 +19,6 @@ const ChatbotPage = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
-  const chatContainerRef = useRef(null);
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useAuth();
 
@@ -33,16 +32,11 @@ const ChatbotPage = () => {
     }
   }, [searchParams, loginWithToken]);
 
-  // Modified scrollToBottom function that keeps input in view
+  // Industry standard scroll implementation
   const scrollToBottom = () => {
-    if (chatContainerRef.current) {
-      // Instead of scrolling the message end ref into view,
-      // directly set scrollTop to the max scroll value
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
-    }
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
-  
-  // Scroll on message changes
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -122,11 +116,8 @@ const ChatbotPage = () => {
             </div>
           </div>
           
-          {/* Chat messages - Fixed layout */}
-          <div 
-            ref={chatContainerRef}
-            className="flex-1 overflow-y-auto p-4 space-y-4"
-          >
+          {/* Chat messages - Standard implementation */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`
@@ -161,12 +152,12 @@ const ChatbotPage = () => {
               </div>
             )}
             
-            {/* Keep an invisible marker at the end */}
+            {/* This is the standard approach - an empty div at the end of messages */}
             <div ref={messagesEndRef} />
           </div>
           
-          {/* Chat input - Fixed at bottom */}
-          <div className="border-t border-white/10 p-4 bg-dark">
+          {/* Chat input */}
+          <div className="border-t border-white/10 p-4">
             <div className="flex gap-2">
               <Input
                 value={input}
@@ -174,7 +165,6 @@ const ChatbotPage = () => {
                 onKeyDown={handleKeyPress}
                 placeholder="Type your message here..."
                 className="bg-white/5 border-white/10 text-white"
-                autoFocus
               />
               <Button 
                 onClick={handleSend} 
