@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation, BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from './components/ui/toaster';
 import { Toaster as Sonner } from './components/ui/sonner';
 import { TooltipProvider } from './components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
 import Index from './pages/Index';
 import NotFound from './pages/NotFound';
@@ -24,6 +24,17 @@ import TeamCompatibilityPage from './pages/TeamCompatibilityPage';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
+// 🆕 ScrollToTop component defined inline
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
+
 // Query client instance
 const queryClient = new QueryClient();
 
@@ -36,6 +47,7 @@ const ProtectedRoute = ({ children }) => {
 const App = () => {
   return (
     <BrowserRouter>
+      <ScrollToTop /> {/* Scroll to top on every route change */}
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <TooltipProvider>
