@@ -18,6 +18,7 @@ const ChatbotPage = () => {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef(null);
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useAuth();
 
@@ -30,6 +31,15 @@ const ChatbotPage = () => {
       loginWithToken(token);
     }
   }, [searchParams, loginWithToken]);
+
+  // Industry standard scroll implementation
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSend = async () => {
     if (input.trim() === '') return;
@@ -106,7 +116,7 @@ const ChatbotPage = () => {
             </div>
           </div>
           
-          {/* Chat messages - No special scroll handling */}
+          {/* Chat messages - Standard implementation */}
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -141,6 +151,9 @@ const ChatbotPage = () => {
                 </div>
               </div>
             )}
+            
+            {/* This is the standard approach - an empty div at the end of messages */}
+            <div ref={messagesEndRef} />
           </div>
           
           {/* Chat input */}
