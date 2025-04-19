@@ -19,6 +19,7 @@ const ChatbotPage = () => {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useAuth();
 
@@ -32,14 +33,37 @@ const ChatbotPage = () => {
     }
   }, [searchParams, loginWithToken]);
 
-  // Industry standard scroll implementation
+  // Improved scroll implementation that accounts for mobile keyboards
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (messagesEndRef.current) {
+      // First attempt - smooth scroll to bottom of messages
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      
+      // Second attempt - force scroll after a short delay to handle keyboard adjustments
+      setTimeout(() => {
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+        }
+      }, 100);
+    }
   };
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  // Detect keyboard visibility on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      // This helps adjust for the keyboard appearing
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSend = async () => {
     if (input.trim() === '') return;
@@ -55,6 +79,11 @@ const ChatbotPage = () => {
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsTyping(true);
+    
+    // Focus logic to ensure input stays visible
+    setTimeout(() => {
+      scrollToBottom();
+    }, 0);
     
     // Simulate AI response
     setTimeout(() => {
@@ -116,8 +145,11 @@ const ChatbotPage = () => {
             </div>
           </div>
           
-          {/* Chat messages - Standard implementation */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Chat messages - Improved implementation */}
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto p-4 space-y-4"
+          >
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`
@@ -152,12 +184,12 @@ const ChatbotPage = () => {
               </div>
             )}
             
-            {/* This is the standard approach - an empty div at the end of messages */}
-            <div ref={messagesEndRef} />
+            {/* Reference for scrolling with improved accessibility */}
+            <div ref={messagesEndRef} className="h-1" />
           </div>
           
-          {/* Chat input */}
-          <div className="border-t border-white/10 p-4">
+          {/* Chat input with improved layout for mobile */}
+          <div className="border-t border-white/10 p-4 sticky bottom-0 bg-dark">
             <div className="flex gap-2">
               <Input
                 value={input}
@@ -165,6 +197,7 @@ const ChatbotPage = () => {
                 onKeyDown={handleKeyPress}
                 placeholder="Type your message here..."
                 className="bg-white/5 border-white/10 text-white"
+                onFocus={scrollToBottom}
               />
               <Button 
                 onClick={handleSend} 
