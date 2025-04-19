@@ -18,7 +18,7 @@ const ChatbotPage = () => {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useAuth();
 
@@ -32,14 +32,26 @@ const ChatbotPage = () => {
     }
   }, [searchParams, loginWithToken]);
 
-  // Industry standard scroll implementation
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  // This function ensures the container scrolls up for new messages
+  const maintainScroll = () => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      // Using scrollHeight ensures we get the full height including overflow
+      container.scrollTop = container.scrollHeight;
+    }
   };
 
+  // Run scroll maintenance when messages change
   useEffect(() => {
-    scrollToBottom();
+    maintainScroll();
   }, [messages]);
+  
+  // Additional effect for handling typing state changes
+  useEffect(() => {
+    if (isTyping) {
+      maintainScroll();
+    }
+  }, [isTyping]);
 
   const handleSend = async () => {
     if (input.trim() === '') return;
@@ -96,9 +108,11 @@ const ChatbotPage = () => {
     <div className="min-h-screen bg-dark flex flex-col">
       <Navigation />
       
-      <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4">
-        <div className="bg-glass rounded-xl flex flex-col flex-1 overflow-hidden">
-          {/* Chat header */}
+      {/* Fixed height main content area */}
+      <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4 max-h-screen">
+        {/* Use a fixed height layout approach */}
+        <div className="bg-glass rounded-xl flex flex-col h-full">
+          {/* Chat header - fixed height */}
           <div className="border-b border-white/10 p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="bg-purple/20 p-2 rounded-full">
@@ -116,8 +130,11 @@ const ChatbotPage = () => {
             </div>
           </div>
           
-          {/* Chat messages - Standard implementation */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+          {/* Message container with flex-1 to take available space */}
+          <div 
+            ref={messagesContainerRef}
+            className="flex-1 overflow-y-auto p-4 space-y-4"
+          >
             {messages.map((message) => (
               <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`
@@ -151,12 +168,9 @@ const ChatbotPage = () => {
                 </div>
               </div>
             )}
-            
-            {/* This is the standard approach - an empty div at the end of messages */}
-            <div ref={messagesEndRef} />
           </div>
           
-          {/* Chat input */}
+          {/* Fixed height input area */}
           <div className="border-t border-white/10 p-4">
             <div className="flex gap-2">
               <Input
@@ -177,7 +191,10 @@ const ChatbotPage = () => {
           </div>
         </div>
       </main>
-      <Footer />
+      {/* Footer can be hidden on mobile when keyboard is open */}
+      <div className="md:block">
+        <Footer />
+      </div>
     </div>
   );
 };
