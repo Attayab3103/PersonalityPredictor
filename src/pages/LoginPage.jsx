@@ -20,11 +20,10 @@ const LoginPage = () => {
     window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/google';
   };
 
+ 
   const handleFacebookLogin = () => {
-    const baseUrl = process.env.REACT_APP_API_URL || 'https://personalitypredictor-react-webapp-2.onrender.com';
-    window.location.href = `${baseUrl}/api/auth/facebook`;
-  };
-
+    window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook';
+    };
   return (
     <div className="min-h-screen bg-dark flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
