@@ -47,7 +47,9 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FB_APP_ID,
     clientSecret: process.env.FB_APP_SECRET,
-    callbackURL: "https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook/callback",
+    callbackURL: process.env.NODE_ENV === 'production' 
+      ? "https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook/callback"
+      : "http://localhost:5000/api/auth/facebook/callback",
     profileFields: ['id', 'displayName', 'email', 'photos']
   },
   async function(accessToken, refreshToken, profile, done) {
