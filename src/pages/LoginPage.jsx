@@ -21,7 +21,7 @@ const LoginPage = () => {
   };
 
   const handleFacebookLogin = () => {
-    window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook';
+    window.location.href = `${process.env.REACT_APP_API_URL || 'https://personalitypredictor-react-webapp-2.onrender.com'}/api/auth/facebook`;
   };
 
   return (

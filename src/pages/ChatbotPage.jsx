@@ -7,12 +7,15 @@ import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
 import { Send, User, Bot, Sparkles } from 'lucide-react';
 
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'; // FastAPI server URL
+
 const ChatbotPage = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
       text: "Hi there! I'm Personality Predictor, your AI personality analysis assistant. Start chatting with me, and I'll analyze your communication style to provide insights about your personality traits. How are you feeling today?",
       sender: 'bot',
+      personality_insight: null,
       timestamp: new Date()
     }
   ]);
@@ -65,6 +68,7 @@ const ChatbotPage = () => {
       id: Date.now(),
       text: input,
       sender: 'user',
+      personality_insight: null,
       timestamp: new Date()
     };
 
@@ -72,32 +76,46 @@ const ChatbotPage = () => {
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      scrollToBottom();
-    }, 0);
+    try {
+      const response = await fetch(`${API_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: input
+        })
+      });
 
-    setTimeout(() => {
-      const botResponses = [
-        "I notice you use descriptive language. This suggests you might have strong visualization abilities and creativity.",
-        "Interesting choice of words. Your communication style indicates you may be analytical and detail-oriented.",
-        "Your message length and structure suggest you're thoughtful and deliberate in your communication.",
-        "I detect a pattern in your writing that's often associated with extroverted personality types.",
-        "The way you express yourself indicates strong emotional intelligence and empathy.",
-        "Your communication style suggests you're pragmatic and solution-oriented."
-      ];
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
 
-      const randomResponse = botResponses[Math.floor(Math.random() * botResponses.length)];
-
+      const data = await response.json();
+      
       const botMessage = {
         id: Date.now(),
-        text: randomResponse,
+        text: data.text,
+        personality_insight: data.personality_insight,
         sender: 'bot',
         timestamp: new Date()
       };
 
       setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error:', error);
+      // Show a fallback message if the API call fails
+      const errorMessage = {
+        id: Date.now(),
+        text: "I apologize, but I'm having trouble analyzing your message right now. Please try again later.",
+        sender: 'bot',
+        personality_insight: null,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -158,6 +176,13 @@ const ChatbotPage = () => {
                     </span>
                   </div>
                   <p className="text-sm">{message.text}</p>
+                  {message.personality_insight && (
+                    <div className="mt-2 pt-2 border-t border-white/10">
+                      <p className="text-xs text-teal italic">
+                        {message.personality_insight}
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
