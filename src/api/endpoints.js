@@ -1,4 +1,5 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const HUGGINGFACE_SPACE_URL = process.env.REACT_APP_HUGGINGFACE_SPACE_URL || 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 const HF_API_URL = process.env.REACT_APP_HF_API_URL || 'https://hunzalarasheed1-personality-assessment-api.hf.space';
 
 // Ensure URLs don't have trailing slashes

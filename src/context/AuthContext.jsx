@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../hooks/use-toast';
 
+const API_URL = process.env.REACT_APP_API_URL || import.meta.env.VITE_API_BASE_URL;
 const AuthContext = createContext(undefined);
 
 export const AuthProvider = ({ children }) => {
@@ -9,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   useEffect(() => {
     // Check if user is already logged in
@@ -16,7 +18,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('token');
       if (token) {
         try {
-          const response = await fetch('https://personalitypredictor-react-webapp-2.onrender.com/api/auth/user/profile', {
+          const response = await fetch(`${API_URL}/auth/user/profile`, {
             method: 'GET',
             headers: {
               'Authorization': `Bearer ${token}`
@@ -40,10 +42,9 @@ export const AuthProvider = ({ children }) => {
     
     checkAuth();
   }, []);
-
   const loginWithToken = async (token) => {
     try {
-      const response = await fetch('https://personalitypredictor-react-webapp-2.onrender.com/api/auth/user/profile', {
+      const response = await fetch(`${API_URL}/auth/user/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,11 +71,10 @@ export const AuthProvider = ({ children }) => {
       });
     }
   };
-
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const response = await fetch('https://personalitypredictor-react-webapp-2.onrender.com/api/auth/login', {
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -113,11 +113,10 @@ export const AuthProvider = ({ children }) => {
       setLoading(false);
     }
   };
-
   const register = async (name, email, password) => {
     setLoading(true);
     try {
-      const response = await fetch('https://personalitypredictor-react-webapp-2.onrender.com/api/auth/signup', {
+      const response = await fetch(`${API_URL}/auth/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
