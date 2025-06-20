@@ -19,7 +19,11 @@ connectDB();
 // Middleware
 app.use(express.json());
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'https://personality-pred-git-d16008-muhammad-attayabs-projects-ff1b6a8d.vercel.app',
+    origin: [
+        'https://personality-predictor-amber.vercel.app',
+        'https://personality-pred-git-d16008-muhammad-attayabs-projects-ff1b6a8d.vercel.app',
+        process.env.FRONTEND_URL
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
