@@ -20,13 +20,17 @@ const SignupPage = () => {
     try {
       await registerUser(data.name, data.email, data.password);
     } catch (error) {
-      if (error?.response?.data?.message) {
-        setServerError(error.response.data.message);
-      } else if (error?.message) {
-        setServerError(error.message);
-      } else {
-        setServerError("An unexpected error occurred. Please try again.");
-      }
+      // Try to extract error message from error object or error.message
+      let msg = error?.message || "An unexpected error occurred. Please try again.";
+      // If error.message is a stringified JSON, try to parse it
+      try {
+        const parsed = JSON.parse(msg);
+        if (parsed?.message) msg = parsed.message;
+        if (parsed?.errors && Array.isArray(parsed.errors) && parsed.errors.length > 0) {
+          msg = parsed.errors[0].msg || parsed.errors[0].message || msg;
+        }
+      } catch {}
+      setServerError(msg);
     }
   };
 
