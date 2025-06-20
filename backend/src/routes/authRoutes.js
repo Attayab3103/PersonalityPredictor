@@ -22,15 +22,13 @@ router.post('/login', [
 
 // Forgot Password
 router.post('/forgot-password', [
-  body('email').trim().notEmpty().isEmail().withMessage('Please provide a valid email'),
+  body('email').isEmail().withMessage('Please provide a valid email'),
 ], forgotPassword);
 
 // Reset Password
 router.post('/reset-password', [
   body('token').notEmpty().withMessage('Token is required'),
-  body('password')
-    .notEmpty().withMessage('Password is required')
-    .isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
 ], resetPassword);
 
 // Google OAuth routes
