@@ -10,12 +10,24 @@ import { Eye, EyeOff, UserPlus, ArrowLeft } from 'lucide-react';
 const SignupPage = () => {
   const { register: registerUser, loading } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [serverError, setServerError] = useState("");
   const { register, handleSubmit, watch, formState: { errors } } = useForm();
   
   const password = watch("password");
   
   const onSubmit = async (data) => {
-    await registerUser(data.name, data.email, data.password);
+    setServerError("");
+    try {
+      await registerUser(data.name, data.email, data.password);
+    } catch (error) {
+      if (error?.response?.data?.message) {
+        setServerError(error.response.data.message);
+      } else if (error?.message) {
+        setServerError(error.message);
+      } else {
+        setServerError("An unexpected error occurred. Please try again.");
+      }
+    }
   };
 
   const handleGoogleLogin = () => {
@@ -39,6 +51,11 @@ const SignupPage = () => {
         
         <div className="bg-glass rounded-xl p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {serverError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mb-2 animate-pulse">
+                <span className="block sm:inline font-semibold">{serverError}</span>
+              </div>
+            )}
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
