@@ -16,7 +16,7 @@ const ContactPage = () => {
   const onSubmit = async (data) => {
     try {
       // Replace with your backend API URL
-      const response = await fetch('https://personalitypredictor-react-webapp-2.onrender.com/api/contact', {
+      const response = await fetch('https://personality-predictor-l9tt.onrender.com/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

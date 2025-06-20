@@ -7,7 +7,7 @@ const User = require('../models/User');
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    callbackURL: "https://personalitypredictor-react-webapp-2.onrender.com/api/auth/google/callback",
+    callbackURL: "https://personality-predictor-l9tt.onrender.com/api/auth/google/callback",
     proxy: true
   },
   async function(accessToken, refreshToken, profile, done) {
@@ -48,7 +48,7 @@ passport.use(new FacebookStrategy({
     clientID: process.env.FB_APP_ID,
     clientSecret: process.env.FB_APP_SECRET,
     callbackURL: process.env.NODE_ENV === 'production' 
-      ? "https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook/callback"
+      ? "https://personality-predictor-l9tt.onrender.com/api/auth/facebook/callback"
       : "http://localhost:5000/api/auth/facebook/callback",
     profileFields: ['id', 'displayName', 'email', 'photos']
   },

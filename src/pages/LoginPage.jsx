@@ -17,12 +17,12 @@ const LoginPage = () => {
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/google';
+    window.location.href = 'https://personality-predictor-l9tt.onrender.com/api/auth/google';
   };
 
  
   const handleFacebookLogin = () => {
-    window.location.href = 'https://personalitypredictor-react-webapp-2.onrender.com/api/auth/facebook';
+    window.location.href = 'https://personality-predictor-l9tt.onrender.com/api/auth/facebook';
     };
   return (
     <div className="min-h-screen bg-dark flex flex-col items-center justify-center p-4">
