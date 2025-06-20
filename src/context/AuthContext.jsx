@@ -151,6 +151,7 @@ export const AuthProvider = ({ children }) => {
         description: error instanceof Error ? error.message : "An error occurred during registration",
         variant: "destructive",
       });
+      throw error; // <-- Add this line to propagate the error to the caller
     } finally {
       setLoading(false);
     }
