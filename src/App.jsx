@@ -21,6 +21,8 @@ import TermsPage from './pages/TermsPage';
 import CookiesPage from './pages/CookiesPage';
 import AiAnalysisPage from './pages/AiAnalysisPage';
 import TeamCompatibilityPage from './pages/TeamCompatibilityPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -76,6 +78,8 @@ const App = () => {
               <Route path="/privacy" element={<PrivacyPage />} />
               <Route path="/terms" element={<TermsPage />} />
               <Route path="/cookies" element={<CookiesPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </TooltipProvider>
