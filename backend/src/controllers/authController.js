@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const { validationResult } = require('express-validator');
 const crypto = require('crypto');
+const { sendResetEmail } = require('../utils/mailer');
 
 exports.signup = async (req, res) => {
     try {
@@ -83,9 +84,10 @@ exports.forgotPassword = async (req, res) => {
         user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
         user.resetPasswordExpires = Date.now() + 1000 * 60 * 60; // 1 hour
         await user.save();
-        // In production, send email with link containing resetToken
-        // For demo, return token in response
-        return res.status(200).json({ message: 'If that email is registered, a reset link has been sent.', resetToken });
+        // Send email with reset link
+        const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`;
+        await sendResetEmail(user.email, resetUrl);
+        return res.status(200).json({ message: 'If that email is registered, a reset link has been sent.' });
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
     }
