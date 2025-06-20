@@ -593,7 +593,7 @@ const ChatbotPage = () => {
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Service URL: <p>personality predictor</p>
+              Powered By: AI Personality Predictor
             </p>
           </div>
         </div>
