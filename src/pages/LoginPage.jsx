@@ -24,6 +24,7 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     setServerError("");
+    setShowVerifyNotice(false);
     try {
       await login(data.email, data.password);
     } catch (error) {
@@ -36,6 +37,12 @@ const LoginPage = () => {
         }
       } catch {}
       setServerError(msg);
+      // If error is about verification, show and blink the verify notice
+      if (msg.toLowerCase().includes('verify your email')) {
+        setShowVerifyNotice(true);
+        setTimeout(() => setShowVerifyNotice(false), 500);
+        setTimeout(() => setShowVerifyNotice(true), 600);
+      }
     }
   };
 
@@ -58,7 +65,7 @@ const LoginPage = () => {
         
         <div className="bg-glass rounded-xl p-8">
           {showVerifyNotice && (
-            <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded mb-4">
+            <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded mb-4 animate-pulse">
               <span className="block sm:inline font-semibold">Please check your email and confirm your account before logging in.</span>
             </div>
           )}
