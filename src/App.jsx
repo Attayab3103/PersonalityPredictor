@@ -60,7 +60,14 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/features" element={<FeaturesPage />} />
-              <Route path="/contact" element={<ContactPage />} />
+              <Route
+                path="/contact"
+                element={
+                  <ProtectedRoute>
+                    <ContactPage />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/ai-analysis" element={<AiAnalysisPage />} />
               <Route path="/team-compatibility" element={<TeamCompatibilityPage />} />
               <Route

@@ -8,9 +8,15 @@ import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
 import { Mail, Phone, MapPin, Send, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const ContactPage = () => {
-  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm();
+  const { user } = useAuth();
+  const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm({
+    defaultValues: {
+      email: user?.email || '',
+    },
+  });
   const { toast } = useToast();
 
   const onSubmit = async (data) => {
@@ -100,6 +106,7 @@ const ContactPage = () => {
                       } 
                     })}
                     className="bg-white/5 border-white/10 text-white"
+                    readOnly={!!user?.email}
                   />
                   {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
                 </div>
