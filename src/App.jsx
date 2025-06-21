@@ -41,10 +41,14 @@ const ScrollToTop = () => {
 // Query client instance
 const queryClient = new QueryClient();
 
-// Protected Route
+// Enhanced ProtectedRoute to support redirect after login
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useAuth();
-  return isAuthenticated ? children : <Navigate to="/login" replace />;
+  const location = useLocation();
+  if (!isAuthenticated) {
+    return <Navigate to={`/login?redirect=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+  return children;
 };
 
 const App = () => {

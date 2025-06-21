@@ -26,7 +26,7 @@ const LoginPage = () => {
     setServerError("");
     setShowVerifyNotice(false);
     try {
-      await login(data.email, data.password);
+      await login(data.email, data.password, location.search);
     } catch (error) {
       let msg = error?.message || "An unexpected error occurred. Please try again.";
       try {

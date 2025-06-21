@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }) => {
       });
     }
   };
-  const login = async (email, password) => {
+  const login = async (email, password, search = '') => {
     setLoading(true);
     try {
       const response = await fetch(`${API_URL}/auth/login`, {
@@ -100,8 +100,14 @@ export const AuthProvider = ({ children }) => {
         title: "Login successful",
         description: `Welcome back, ${data.name}!`,
       });
-      
-      navigate('/chat');
+      // Handle redirect after login
+      const params = new URLSearchParams(search);
+      const redirect = params.get('redirect');
+      if (redirect) {
+        navigate(redirect);
+      } else {
+        navigate('/chat');
+      }
     } catch (error) {
       console.error('Login error:', error);
       toast({
