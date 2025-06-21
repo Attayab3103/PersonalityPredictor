@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, User, Bot, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { Send, User, Bot, Sparkles, AlertCircle, CheckCircle, ToggleRight, ToggleLeft } from 'lucide-react';
 
 // Configuration for your Hugging Face Space
 const HUGGINGFACE_SPACE_URL = 'https://hunzalarasheed1-personality-assessment-api.hf.space';
@@ -86,6 +86,7 @@ const ChatbotPage = () => {
     interests: ''
   });
   const [profileStep, setProfileStep] = useState(0);
+  const [language, setLanguage] = useState('en'); // 'en' or 'ur'
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
@@ -110,10 +111,26 @@ const ChatbotPage = () => {
     return text.replace(/\*+/g, ''); // Remove all asterisks
   };
 
-  const addMessage = (sender, text, personality_insight = null) => {
+  const translateText = async (text, targetLang) => {
+    if (targetLang === 'en') return text;
+    // Simple translation using Google Translate API or similar (for demo, just return text)
+    // You can replace this with a real translation API if needed
+    // For now, just simulate Urdu translation
+    if (targetLang === 'ur') {
+      // Simulate translation (replace with real API call in production)
+      return `اردو: ${text}`;
+    }
+    return text;
+  };
+
+  const addMessage = async (sender, text, personality_insight = null) => {
+    let displayText = text;
+    if (sender === 'bot') {
+      displayText = await translateText(text, language);
+    }
     setMessages(prev => [...prev, {
       id: `${Date.now()}-${Math.random()}`,
-      text: sanitizeText(text), // Sanitize text before adding
+      text: sanitizeText(displayText), // Sanitize text before adding
       sender,
       personality_insight,
       timestamp: new Date()
@@ -482,6 +499,10 @@ const ChatbotPage = () => {
     }
   };
 
+  const handleLanguageToggle = () => {
+    setLanguage((prev) => (prev === 'en' ? 'ur' : 'en'));
+  };
+
   const getConnectionStatusIcon = () => {
     switch (connectionStatus) {
       case 'connected':
@@ -591,6 +612,16 @@ const ChatbotPage = () => {
               >
                 <Send size={18} />
               </Button>
+            </div>
+            <div className="flex justify-end items-center mb-4">
+              <span className="mr-2 text-sm text-white">Language:</span>
+              <button
+                onClick={handleLanguageToggle}
+                className="flex items-center px-3 py-1 rounded-full border border-white/20 bg-white/10 hover:bg-purple/20 transition-all"
+              >
+                {language === 'en' ? <ToggleRight className="text-purple mr-1" /> : <ToggleLeft className="text-teal mr-1" />}
+                <span className="font-semibold text-white">{language === 'en' ? 'English' : 'Urdu'}</span>
+              </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
               Powered By: AI Personality Predictor
