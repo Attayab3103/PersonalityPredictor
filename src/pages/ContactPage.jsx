@@ -7,7 +7,7 @@ import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { Button } from '../components/ui/button';
 import { Label } from '../components/ui/label';
-import { Mail, Phone, MapPin, Send, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, Facebook, Twitter, Instagram, Linkedin, Mic } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const ContactPage = () => {
@@ -18,6 +18,41 @@ const ContactPage = () => {
     },
   });
   const { toast } = useToast();
+  const [listening, setListening] = React.useState(false);
+  const messageRef = React.useRef();
+  const recognitionRef = React.useRef(null);
+
+  // Speech-to-text setup
+  React.useEffect(() => {
+    if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) return;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognitionRef.current = new SpeechRecognition();
+    recognitionRef.current.continuous = false;
+    recognitionRef.current.interimResults = false;
+    recognitionRef.current.lang = 'en-US';
+    recognitionRef.current.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      if (messageRef.current) {
+        messageRef.current.value = (messageRef.current.value || '') + transcript;
+        // Manually trigger react-hook-form change event
+        const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value').set;
+        nativeInputValueSetter.call(messageRef.current, messageRef.current.value);
+        messageRef.current.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    };
+    recognitionRef.current.onend = () => setListening(false);
+  }, []);
+
+  const handleMicClick = () => {
+    if (!recognitionRef.current) return;
+    if (listening) {
+      recognitionRef.current.stop();
+      setListening(false);
+    } else {
+      recognitionRef.current.start();
+      setListening(true);
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -59,41 +94,6 @@ const ContactPage = () => {
               <span className="text-gradient">Contact Us</span>
             </h1>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-              Have questions or feedback? We'd love to hear from you. Fill out the form below and we'll get back to you soon.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-10">
-            {/* Contact Form */}
-            <div className="bg-glass rounded-xl p-8">
-              <h2 className="text-2xl font-bold mb-6 text-white">Send us a Message</h2>
-              
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      placeholder="John"
-                      {...register("firstName", { required: "First name is required" })}
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                    {errors.firstName && <p className="text-red-500 text-sm">{errors.firstName.message}</p>}
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      placeholder="Doe"
-                      {...register("lastName", { required: "Last name is required" })}
-                      className="bg-white/5 border-white/10 text-white"
-                    />
-                    {errors.lastName && <p className="text-red-500 text-sm">{errors.lastName.message}</p>}
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
                     id="email"
