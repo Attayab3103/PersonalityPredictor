@@ -56,11 +56,12 @@ exports.login = async (req, res) => {
 
         // Find user and include password
         const user = await User.findOne({ email }).select('+password');
-        
         if (!user || !(await user.matchPassword(password))) {
             return res.status(401).json({ message: 'Invalid email or password' });
         }
-
+        if (!user.isVerified) {
+            return res.status(403).json({ message: 'Please verify your email before logging in.' });
+        }
         const token = user.generateToken();
 
         res.json({
