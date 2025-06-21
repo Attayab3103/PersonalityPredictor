@@ -23,6 +23,7 @@ import AiAnalysisPage from './pages/AiAnalysisPage';
 import TeamCompatibilityPage from './pages/TeamCompatibilityPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 import { AuthProvider, useAuth } from './context/AuthContext';
 
@@ -80,6 +81,7 @@ const App = () => {
               <Route path="/cookies" element={<CookiesPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/reset-password" element={<ResetPasswordPage />} />
+              <Route path="/verify-email" element={<VerifyEmailPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </TooltipProvider>
