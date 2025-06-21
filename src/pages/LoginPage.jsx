@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
@@ -9,10 +9,19 @@ import { Eye, EyeOff, LogIn, ArrowRight } from 'lucide-react';
 
 const LoginPage = () => {
   const { login, loading } = useAuth();
+  const location = useLocation();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState("");
+  const [showVerifyNotice, setShowVerifyNotice] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
   
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    if (params.get('verify') === '1') {
+      setShowVerifyNotice(true);
+    }
+  }, [location.search]);
+
   const onSubmit = async (data) => {
     setServerError("");
     try {
@@ -48,6 +57,11 @@ const LoginPage = () => {
         </div>
         
         <div className="bg-glass rounded-xl p-8">
+          {showVerifyNotice && (
+            <div className="bg-blue-100 border border-blue-400 text-blue-700 px-4 py-2 rounded mb-4">
+              <span className="block sm:inline font-semibold">Please check your email and confirm your account before logging in.</span>
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {serverError && (
               <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded relative mb-2 animate-pulse">
