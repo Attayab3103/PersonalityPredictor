@@ -97,4 +97,28 @@ router.get('/user/profile', protect, (req, res) => {
     });
 });
 
+// Email verification
+router.get('/verify-email', async (req, res) => {
+    const { token, email } = req.query;
+    if (!token || !email) {
+        return res.status(400).json({ message: 'Invalid verification link.' });
+    }
+    try {
+        const user = await require('../models/User').findOne({ email, verificationToken: token });
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired verification token.' });
+        }
+        if (user.verificationTokenExpires < Date.now()) {
+            return res.status(400).json({ message: 'Verification token has expired.' });
+        }
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpires = undefined;
+        await user.save();
+        res.redirect(`${process.env.FRONTEND_URL}/login?verified=1`);
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error: error.message });
+    }
+});
+
 module.exports = router;

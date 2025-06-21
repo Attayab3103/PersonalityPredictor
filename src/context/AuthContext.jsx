@@ -129,22 +129,12 @@ export const AuthProvider = ({ children }) => {
         const error = await response.json();
         throw new Error(error.message || 'Registration failed');
       }
-      
       const data = await response.json();
-      localStorage.setItem('token', data.token);
-      setUser({
-        _id: data._id,
-        name: data.name,
-        email: data.email,
-        profilePic: data.profilePic
-      });
-      
       toast({
         title: "Registration successful",
-        description: `Welcome to Personality Predictor, ${data.name}!`,
+        description: "Please check your email and verify your account before logging in.",
       });
-      
-      navigate('/chat');
+      navigate('/login?verify=1');
     } catch (error) {
       console.error('Registration error:', error);
       toast({
