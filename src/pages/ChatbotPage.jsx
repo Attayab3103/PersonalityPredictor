@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Bot, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
-import Navigation from './Navigation'; // Adjust the import path as needed
+import Navigation from '../components/Navigation'; // Adjust the import path as needed
 
 // Configuration for your Hugging Face Space
 const HUGGINGFACE_SPACE_URL = 'https://hunzalarasheed1-personality-assessment-api.hf.space';
