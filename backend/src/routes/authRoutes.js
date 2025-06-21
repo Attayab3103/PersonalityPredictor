@@ -115,6 +115,10 @@ router.get('/verify-email', async (req, res) => {
         user.verificationToken = undefined;
         user.verificationTokenExpires = undefined;
         await user.save();
+        // If request is AJAX/fetch, send JSON. Otherwise, redirect.
+        if (req.headers.accept && req.headers.accept.includes('application/json')) {
+            return res.json({ message: 'Email verified successfully.' });
+        }
         res.redirect(`${process.env.FRONTEND_URL}/login?verified=1`);
     } catch (error) {
         res.status(500).json({ message: 'Server error', error: error.message });
