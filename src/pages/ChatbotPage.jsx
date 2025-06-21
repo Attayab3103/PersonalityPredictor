@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Bot, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import Navigation from './Navigation'; // Adjust the import path as needed
 
 // Configuration for your Hugging Face Space
 const HUGGINGFACE_SPACE_URL = 'https://hunzalarasheed1-personality-assessment-api.hf.space';
@@ -506,6 +507,7 @@ const ChatbotPage = () => {
 
   return (
     <div className="min-h-screen bg-dark flex flex-col">
+      <Navigation />
       <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4 overflow-hidden">
         <div className="bg-glass rounded-xl flex flex-col flex-1 overflow-hidden">
           {/* Chat header */}
