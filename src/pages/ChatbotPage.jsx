@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, User, Bot, Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
-import Navigation from '../components/Navigation'; // Adjust the import path as needed
+
+// Navigation component stub - replace with your actual import
+const Navigation = () => <div className="h-16 bg-black/50 backdrop-blur-sm" />;
 
 // Configuration for your Hugging Face Space
 const HUGGINGFACE_SPACE_URL = 'https://hunzalarasheed1-personality-assessment-api.hf.space';
@@ -74,7 +76,7 @@ const Button = ({ onClick, className, disabled, children }) => (
 );
 
 const ChatbotPage = () => {
-  const [messages, setMessages] = useState([]); // Removed default message
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId, setSessionId] = useState(null);
@@ -86,7 +88,8 @@ const ChatbotPage = () => {
     field: '',
     interests: ''
   });
-  const [profileStep, setProfileStep] = useState(0);
+  const [profileStep, setProfileStep] = useState('profession');
+  const [profileComplete, setProfileComplete] = useState(false);
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
@@ -98,17 +101,14 @@ const ChatbotPage = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Initial welcome message
   useEffect(() => {
-    // Check connection status on component mount
+    addMessage('bot', 'Welcome! I\'m your AI Personality Assessment Assistant. Before we begin, I need to know a bit about you. What is your profession?');
     checkHealthStatus();
   }, []);
 
-  useEffect(() => {
-    addMessage('bot', 'Welcome! Before we start, please provide your profile details. What is your profession?');
-  }, []);
-
   const sanitizeText = (text) => {
-    return text.replace(/\*+/g, ''); // Remove all asterisks
+    return text.replace(/\*+/g, '');
   };
 
   const addMessage = (sender, text, personality_insight = null) => {
@@ -144,31 +144,43 @@ const ChatbotPage = () => {
     }
   };
 
-  const handleProfileInput = (key, value) => {
-    setUserProfile((prev) => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
-  const validateProfile = () => {
-    const { profession, field, interests } = userProfile;
-    return profession.trim() && field.trim() && interests.trim();
-  };
-
-  const startAssessment = async () => {
-    if (!validateProfile()) {
-      addMessage('bot', 'Please provide your profile details (profession, field, and interests) before starting the assessment.');
+  const handleProfileInput = async (value) => {
+    if (!value.trim()) {
+      addMessage('bot', 'Please provide a valid response.');
       return;
     }
 
+    switch (profileStep) {
+      case 'profession':
+        setUserProfile(prev => ({ ...prev, profession: value }));
+        setProfileStep('field');
+        addMessage('bot', `Great! As a ${value}, what field or industry do you work in?`);
+        break;
+      
+      case 'field':
+        setUserProfile(prev => ({ ...prev, field: value }));
+        setProfileStep('interests');
+        addMessage('bot', `Excellent! Now, what are your main interests or hobbies outside of your work in ${value}?`);
+        break;
+      
+      case 'interests':
+        setUserProfile(prev => ({ ...prev, interests: value }));
+        setProfileComplete(true);
+        setProfileStep('complete');
+        addMessage('bot', 'Perfect! I have your profile ready. Starting your personality assessment now...');
+        // Automatically start assessment after profile completion
+        setTimeout(() => startAssessment(), 1000);
+        break;
+    }
+  };
+
+  const startAssessment = async () => {
     try {
       setIsLoading(true);
-      addMessage('bot', 'Starting your personality assessment...');
-
+      
       const { url, config } = endpoints.startAssessment;
-
       console.log('Starting assessment - URL:', url);
+      
       const response = await fetch(url, {
         ...config,
         mode: 'cors',
@@ -211,11 +223,11 @@ const ChatbotPage = () => {
       
       let userMessage;
       if (error.message.includes('Failed to fetch') || error.name === 'TypeError') {
-        userMessage = `Unable to connect to the assessment service at ${HUGGINGFACE_SPACE_URL}. Please check if the Hugging Face Space is running and try again.`;
+        userMessage = `Unable to connect to the assessment service. Please check if the service is running and try again.`;
       } else if (error.message.includes('status 503') || error.message.includes('status 502')) {
         userMessage = 'The assessment service is currently starting up. Please wait a moment and try again.';
       } else {
-        userMessage = `Sorry, something went wrong: ${error.message}. Please try again by typing "start".`;
+        userMessage = `Sorry, something went wrong: ${error.message}. Please refresh the page to try again.`;
       }
       addMessage('bot', userMessage);
       setSessionId(null);
@@ -271,13 +283,11 @@ const ChatbotPage = () => {
         const errorText = await response.text();
         console.error('Get question error:', errorText);
         
-        // Try to parse as JSON for better error handling
         try {
           const errorData = JSON.parse(errorText);
           if (errorData.detail?.includes('Invalid session state')) {
             console.log('Invalid session state, resubmitting profile...');
             await submitProfile(sid);
-            // Retry getting the question
             return getNextQuestion(sid);
           }
           throw new Error(errorData.detail || `Server error: ${response.status}`);
@@ -293,11 +303,11 @@ const ChatbotPage = () => {
         throw new Error('Invalid question format received');
       }
       
-      addMessage('bot', data.question);
-      setCurrentQuestion(data.question_number);
+      setCurrentQuestion(data.question_number || currentQuestion + 1);
+      addMessage('bot', `Question ${data.question_number || currentQuestion + 1} of ${TOTAL_QUESTIONS}: ${data.question}`);
     } catch (error) {
       console.error('Error getting question:', error);
-      addMessage('bot', `Sorry, I had trouble getting the next question: ${error.message}. Please type "start" to try again.`);
+      addMessage('bot', `Sorry, I had trouble getting the next question: ${error.message}. Please refresh the page to try again.`);
       setSessionId(null);
       setAssessmentStarted(false);
     }
@@ -412,35 +422,23 @@ const ChatbotPage = () => {
       setAssessmentStarted(false);
       setSessionId(null);
       setCurrentQuestion(0);
+      setProfileStep('profession');
+      setProfileComplete(false);
+      setUserProfile({ profession: '', field: '', interests: '' });
       
       // Offer to start again
       setTimeout(() => {
-        addMessage('bot', "Would you like to take the assessment again? Just type 'start' to begin a new session!");
+        addMessage('bot', "Would you like to take the assessment again? Just refresh the page to begin a new session!");
       }, 2000);
       
     } catch (error) {
       console.error('Error getting results:', error);
-      addMessage('bot', `Sorry, I had trouble generating your results: ${error.message}. Please type "start" to try the assessment again.`);
+      addMessage('bot', `Sorry, I had trouble generating your results: ${error.message}. Please refresh the page to try the assessment again.`);
       setAssessmentStarted(false);
       setSessionId(null);
       setCurrentQuestion(0);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleProfilePrompt = async (userInput) => {
-    const steps = ['profession', 'field', 'interests'];
-
-    if (profileStep < steps.length) {
-      handleProfileInput(steps[profileStep], userInput);
-      setProfileStep(profileStep + 1);
-
-      if (profileStep + 1 < steps.length) {
-        addMessage('bot', `Please enter your ${steps[profileStep + 1]}.`);
-      } else {
-        addMessage('bot', "Thank you for providing your profile details! Type 'start' to begin your personality assessment, or 'health' to check if the service is running.");
-      }
     }
   };
 
@@ -453,11 +451,7 @@ const ChatbotPage = () => {
 
     const lowerInput = userInput.toLowerCase();
 
-    if (profileStep < 3) {
-      await handleProfilePrompt(userInput);
-      return;
-    }
-
+    // Check for health/status command at any time
     if (lowerInput === 'health' || lowerInput === 'status') {
       await checkHealthStatus();
       const statusMessage = connectionStatus === 'connected' 
@@ -467,12 +461,17 @@ const ChatbotPage = () => {
       return;
     }
 
-    if (!sessionId && lowerInput === 'start') {
-      await startAssessment();
-    } else if (sessionId && assessmentStarted) {
+    // Handle profile collection
+    if (!profileComplete) {
+      await handleProfileInput(userInput);
+      return;
+    }
+
+    // Handle assessment answers
+    if (sessionId && assessmentStarted) {
       await submitAnswer(userInput);
     } else {
-      addMessage('bot', "Please type 'start' to begin the personality assessment, or 'health' to check service status.");
+      addMessage('bot', "I'm not sure what you mean. If you'd like to start a new assessment, please refresh the page.");
     }
   };
 
@@ -506,25 +505,33 @@ const ChatbotPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-dark flex flex-col">
+    <div className="min-h-screen bg-gray-900 flex flex-col">
       <Navigation />
       <main className="flex-1 flex flex-col max-w-6xl mx-auto w-full p-4 overflow-hidden">
-        <div className="bg-glass rounded-xl flex flex-col flex-1 overflow-hidden">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl flex flex-col flex-1 overflow-hidden shadow-2xl">
           {/* Chat header */}
           <div className="border-b border-white/10 p-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="bg-purple/20 p-2 rounded-full">
-                <Bot size={24} className="text-purple" />
+              <div className="bg-purple-600/20 p-2 rounded-full">
+                <Bot size={24} className="text-purple-400" />
               </div>
               <div>
                 <h2 className="font-semibold text-white">Personality Predictor AI</h2>
-                <p className="text-xs text-gray-400">Personality Analysis Assistant</p>
+                <p className="text-xs text-gray-400">
+                  {profileComplete && assessmentStarted 
+                    ? `Question ${currentQuestion} of ${TOTAL_QUESTIONS}` 
+                    : 'Personality Analysis Assistant'}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="flex items-center text-xs px-2 py-1 gap-1 bg-teal/20 text-teal rounded-full">
+              <span className="flex items-center text-xs px-2 py-1 gap-1 bg-teal-500/20 text-teal-400 rounded-full">
                 <Sparkles size={12} /> AI-Powered
               </span>
+              <div className="flex items-center gap-1 text-xs text-gray-400">
+                {getConnectionStatusIcon()}
+                <span>{getConnectionStatusText()}</span>
+              </div>
             </div>
           </div>
 
@@ -538,22 +545,22 @@ const ChatbotPage = () => {
                 <div className={`
                   max-w-[80%] md:max-w-[70%] rounded-2xl p-3 
                   ${message.sender === 'user' 
-                    ? 'bg-purple/30 rounded-tr-sm text-white' 
+                    ? 'bg-purple-600/30 rounded-tr-sm text-white' 
                     : 'bg-white/5 rounded-tl-sm text-gray-200'}
                 `}>
                   <div className="flex items-center space-x-2 mb-1">
                     {message.sender === 'bot' 
-                      ? <Bot size={16} className="text-teal" /> 
-                      : <User size={16} className="text-purple" />}
+                      ? <Bot size={16} className="text-teal-400" /> 
+                      : <User size={16} className="text-purple-400" />}
                     <span className="text-xs text-gray-400">
                       {message.sender === 'bot' ? 'Personality Predictor AI' : 'You'} • {formatTimeString(message.timestamp)}
                     </span>
                   </div>
-                  <p className="text-sm leading-relaxed">{message.text}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
                   {message.personality_insight && (
                     <div className="mt-2 pt-2 border-t border-white/10">
-                      <p className="text-xs text-teal italic font-medium">
-                        🧠 {message.personality_insight}
+                      <p className="text-xs text-teal-400 italic font-medium">
+                        🧠 Personality Type: {message.personality_insight}
                       </p>
                     </div>
                   )}
@@ -575,27 +582,33 @@ const ChatbotPage = () => {
           </div>
 
           {/* Chat input */}
-          <div className="border-t border-white/10 p-4 sticky bottom-0 bg-dark">
+          <div className="border-t border-white/10 p-4 sticky bottom-0 bg-gray-800/50 backdrop-blur-sm">
             <div className="flex gap-2 items-center">
               <Input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyPress}
-                placeholder="Type your message here..."
-                className="flex-1 bg-white/5 border-white/10 text-white"
+                placeholder={
+                  !profileComplete 
+                    ? `Enter your ${profileStep}...` 
+                    : assessmentStarted 
+                      ? "Type your answer here..." 
+                      : "Type your message here..."
+                }
+                className="flex-1 bg-white/5 border-white/10 text-white placeholder-gray-400"
                 onFocus={scrollToBottom}
                 disabled={isLoading}
               />
               <Button 
                 onClick={handleSend} 
-                className="bg-gradient-to-r from-purple to-teal hover:opacity-90"
+                className="bg-gradient-to-r from-purple-600 to-teal-500 text-white px-6"
                 disabled={!input.trim() || isLoading}
               >
                 <Send size={18} />
               </Button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Powered By: AI Personality Predictor
+              Powered By: AI Personality Predictor • Type "health" to check service status
             </p>
           </div>
         </div>
