@@ -25,7 +25,6 @@ const Footer = () => {
             <h4 className="font-semibold text-white mb-4">Features</h4>
             <ul className="space-y-2">
               <li><Link to="/ai-analysis" className="text-gray-400 hover:text-purple">AI Analysis</Link></li>
-              <li><Link to="/team-compatibility" className="text-gray-400 hover:text-purple">Team Compatibility</Link></li>
               <li><Link to="/chat" className="text-gray-400 hover:text-purple">Chat Analysis</Link></li>
               <li><Link to="/features" className="text-gray-400 hover:text-purple">All Features</Link></li>
             </ul>
@@ -36,8 +35,6 @@ const Footer = () => {
             <ul className="space-y-2">
               <li><Link to="/about" className="text-gray-400 hover:text-purple">About Us</Link></li>
               <li><Link to="/contact" className="text-gray-400 hover:text-purple">Contact</Link></li>
-              <li><Link to="/careers" className="text-gray-400 hover:text-purple">Careers</Link></li>
-              <li><Link to="/blog" className="text-gray-400 hover:text-purple">Blog</Link></li>
             </ul>
           </div>
           
@@ -45,8 +42,6 @@ const Footer = () => {
             <h4 className="font-semibold text-white mb-4">Legal</h4>
             <ul className="space-y-2">
               <li><Link to="/privacy" className="text-gray-400 hover:text-purple">Privacy Policy</Link></li>
-              <li><Link to="/terms" className="text-gray-400 hover:text-purple">Terms of Service</Link></li>
-              <li><Link to="/cookies" className="text-gray-400 hover:text-purple">Cookie Policy</Link></li>
             </ul>
           </div>
         </div>
